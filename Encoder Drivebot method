@@ -1,0 +1,61 @@
+
+
+/**********************************************
+     * BEGIN METHODS driveDistance, driveBot
+     *********************************************/
+    
+    /**
+    * Drive Distance Method
+    * Calculate distance from CM to encoder counts
+    */  
+    public static double driveDistance(double distance)
+    {
+        double drive  = (ENCODER_CLICKS/ WHEEL_CIRC);
+        int outputClicks= (int)Math.floor(drive * distance);
+        return outputClicks;
+    }
+    // END driveDistance() method
+
+
+
+public void driveBot(double distanceInCMleft, double distanceInCMright, double power, double timeoutS) 
+    {
+        telemetry.addData("status","encoder reset");
+        telemetry.update();
+        
+        int rightTarget;
+        int leftTarget;
+
+        if(opModeIsActive()) 
+        {
+            telemetry.addData("status","getEncoderClicks");
+            telemetry.update();
+            
+            rightTarget = (int) driveDistance(distanceInCMright);
+            leftTarget = (int) driveDistance(distanceInCMleft);
+
+            right.setTargetPosition(rightTarget);
+            left.setTargetPosition(leftTarget);
+
+            right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            
+            runtime.reset();
+
+            right.setPower(power);
+            left.setPower(power);
+        
+            while (opModeIsActive() &&
+                (runtime.seconds() < timeoutS) &&
+                (left.isBusy() && right.isBusy()))
+                {
+                    telemetry.addData("Path1", "leftTarget, rightTarget" );
+                    telemetry.update();
+                }
+            left.setPower(0);
+            right.setPower(0);
+            left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }   
+    }
+    // END driveBot method
