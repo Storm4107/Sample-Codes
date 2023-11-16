@@ -1,4 +1,14 @@
+//init calculations
+// encoder clicks are originally 1680
+    // multiply that by drive train gear ratio (two thirds)   
+    private static final int ENCODER_CLICKS = 28; //HD hex motor
+    private static final double WHEEL_DIAM = 9.6; //gobuilda in CM
+    private static final double WHEEL_CIRC = WHEEL_DIAM * Math.PI;
+    private static final double DRIVE_GEAR_RATIO = 2/3;
+    private static final double CLICKS_PER_CM = ENCODER_CLICKS / WHEEL_CIRC;
 
+
+----------
 
 /**********************************************
      * BEGIN METHODS driveDistance, driveBot
@@ -17,7 +27,6 @@
     // END driveDistance() method
 
 
-
 public void driveBot(double distanceInCMleft, double distanceInCMright, double power, double timeoutS) 
     {
         telemetry.addData("status","encoder reset");
@@ -34,20 +43,26 @@ public void driveBot(double distanceInCMleft, double distanceInCMright, double p
             rightTarget = (int) driveDistance(distanceInCMright);
             leftTarget = (int) driveDistance(distanceInCMleft);
 
-            right.setTargetPosition(rightTarget);
-            left.setTargetPosition(leftTarget);
+            rightfront.setTargetPosition(rightTarget);
+            leftfront.setTargetPosition(leftTarget);
+            rightback.setTargetPosition(rightTarget);
+            leftback.setTargetPosition(leftTarget);
 
-            right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightfront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftfront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             
             runtime.reset();
 
-            right.setPower(power);
-            left.setPower(power);
+            rightfront.setPower(power);
+            leftfront.setPower(power);
+            rightback.setPower(power);
+            leftback.setPower(power);
         
             while (opModeIsActive() &&
                 (runtime.seconds() < timeoutS) &&
-                (left.isBusy() && right.isBusy()))
+                (left.isBusy() && right.isBusy() ))
                 {
                     telemetry.addData("Path1", "leftTarget, rightTarget" );
                     telemetry.update();
@@ -59,3 +74,15 @@ public void driveBot(double distanceInCMleft, double distanceInCMright, double p
         }   
     }
     // END driveBot method
+
+
+    //example step in autonomous
+    driveBot(91.4,91.4,0.4,5.0);
+            telemetry.addData("status","first run to position called" );
+            telemetry.addData("status", left.getMode() );
+            telemetry.addData("status","left motor,  %7d", left.getCurrentPosition() );
+            telemetry.addData("status","right motor,  %7d", right.getCurrentPosition() );
+            telemetry.update();
+            right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            sleep(1000);
