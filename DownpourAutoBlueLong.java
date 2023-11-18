@@ -265,7 +265,7 @@
                  
                  
                  } else {
-                 left90();
+                 right90();
                  Parse2();
                      if ((LensPosition > 1.99) && (LensPosition < 2.01)) {
                          
@@ -335,8 +335,8 @@
              
              telemetry.update();
              
-             rightTarget = (int) driveDistance(distanceInINCHESright);
-             leftTarget = (int) -driveDistance(distanceInINCHESleft);
+             rightTarget = (int) driveDistance(distanceInFEETright);
+             leftTarget = (int) -driveDistance(distanceInFEETleft);
  
              RightFront.setTargetPosition(rightTarget);
              LeftFront.setTargetPosition(leftTarget);
@@ -431,13 +431,13 @@
            
            sleep(30000);
        }
-       //Left Position
+       //right Position
         public void Path2() {
              driveBot(0.35, 0.35, 0.3, 2);
            driveBot(-0.45, -0.45, 0.3, 2);
            sleep(200);
            //turn to align with the stage door
-           right90();
+           left90();
            //drive to the stage door
            driveBot(1.5, 2, 0.3, 5);
            //drive through the stage door
@@ -446,14 +446,14 @@
            
            sleep(30000);
        }
-       //right position
+       //Left position
         public void Path3() {
            right180();
            driveBot(0.35, 0.35, 0.3, 2);
            driveBot(-0.45, -0.45, 0.3, 2);
            sleep(200);
            //turn to align with the stage door
-           left90();
+           right90();
            //drive to the stage door
            driveBot(1.5, 1.5, 0.3, 5);
            //drive through the stage door
@@ -529,7 +529,50 @@
       //close
       ServoLeft.setPosition(1);
       
-  }      
+  }    
+  
+  //set wrist in transit/drop position
+  public void WristTransit() {
+   Elbow.setTargetPosition(1750);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setPower(0.5);
+   sleep(1000);
+   Elbow.setPower(0);
+   
+  }
+  
+  //set arm in drop position
+  public void ArmDrop() {
+   RightArmM.setTargetPosition(1750);
+   LeftArmM.setTargetPosition(1750);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   sleep(2000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   
+  }
+  
+  //Zero the arm and wrist
+  public void ArmZero() {
+   RightArmM.setTargetPosition(0);
+   LeftArmM.setTargetPosition(0);
+    Elbow.setTargetPosition(0);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   Elbow.setPower(0.5);
+   sleep(2000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   Elbow.setPower(0);
+   
+  }
+  
   
   //Operational methods end
  }
