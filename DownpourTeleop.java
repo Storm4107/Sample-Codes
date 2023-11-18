@@ -51,10 +51,7 @@ public class DownpourTeleop extends LinearOpMode {
     static final double TURN_SPEED = 0.5;
     static final double speed = 0.5;
     
-    //Huskylens/IMU definitions
-        private final int READ_PERIOD = 1;
-
-    private HuskyLens huskyLens;
+  
 
 
     /**
@@ -104,18 +101,6 @@ public class DownpourTeleop extends LinearOpMode {
         RightArmM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        /*
-        FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Wrist.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-         */
-
 
         // put initialization code here
         FrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -131,35 +116,12 @@ public class DownpourTeleop extends LinearOpMode {
         if (opModeIsActive()) {
         }
 
-            /*private void drive(int leftTarget, int rightTarget, double speed) {
-                LeftPos += leftTarget;
-                RightPos += rightTarget;
-
-                FrontLeft.setTargetPosition(LeftPos);
-                FrontRight.setTargetPosition(RightPos);
-                BackLeft.setTargetPosition(LeftPos);
-                BackRight.setTargetPosition(RightPos);
-
-                FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                BackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                FrontLeft.setPower(speed);
-                FrontRight.setPower(speed);
-                BackRight.setPower(speed);
-                BackLeft.setPower(speed);
-
-                while (opModeIsActive() && FrontRight.isBusy() && FrontLeft.isBusy() && BackLeft.isBusy() && BackRight.isBusy()) {
-                    idle();
-                   /*
-             */
 
             //put run blocks here
             while (opModeIsActive()) {
                 
                 
-                
+                //Drivetrain math
                 double forward = gamepad1.left_stick_y;
                 double strafe = -gamepad1.left_stick_x;
                 double turn = -gamepad1.right_stick_x;
@@ -173,17 +135,19 @@ public class DownpourTeleop extends LinearOpMode {
                 BackLeft.setPower((forward - strafe + turn) / denominator);
                 BackRight.setPower((forward + strafe - turn) / denominator);
 
+
+
+
+                //Arm Input
                 LeftArmM.setPower(gamepad2.right_stick_y);
                 RightArmM.setPower(gamepad2.right_stick_y);
 
-               if (gamepad2.left_stick_y >0) {
-                   Elbow.setPower(.5);
-               } else if (gamepad2.left_stick_y <0) {
-                   Elbow.setPower(-.5);
-               }
-               else Elbow.setPower(0);
+
+                //Elbow Input
+                   Elbow.setPower(gamepad2.left_stick_y * .5);
 
 
+                //Wrist Input
                 if (gamepad2.dpad_right) {
                     Wrist.setPower(1);
                 } else if (gamepad2.dpad_down) {
@@ -191,6 +155,9 @@ public class DownpourTeleop extends LinearOpMode {
                 } else {
                     Wrist.setPower(0);
 
+
+                //trigger arm preset command    
+                //inputs speed and runtime
                 if (gamepad2.y) {
                     preset(0.7, 5.0);
                     
@@ -249,6 +216,8 @@ public class DownpourTeleop extends LinearOpMode {
                     }
                 }
                 
+
+                //preset method
                 public void preset(double speed, double timeoutS) {
                     int newArmTarget;
                     int newWristTarget;
@@ -299,25 +268,7 @@ public class DownpourTeleop extends LinearOpMode {
                 }
  
  
- //Operational methods
  
- public void RightServoDrop() {
-     //open
-      ServoRight.setPosition(0);
-     sleep(500);
-     //close
-     ServoRight.setPosition(1);
-     
- }        
- 
- public void LeftServoDrop() {
-     //open
-      ServoLeft.setPosition(0);
-     sleep(500);
-     //close
-     ServoLeft.setPosition(1);
-     
- }      
-                
+       
                 
 }

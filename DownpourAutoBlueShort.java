@@ -78,9 +78,9 @@
   * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
   * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
   */
- @Autonomous(name="DownpourAutoRedLong", group="Linear OpMode")
+ @Autonomous(name="DownpourAutoBlueShort", group="Linear OpMode")
  
- public class DownpourAutoRedLong extends LinearOpMode {
+ public class DownpourAutoBlueShort extends LinearOpMode {
  
      // Declare OpMode members.
       private DcMotor LeftFront;
@@ -233,8 +233,9 @@
          waitForStart();
          runtime.reset();
          
-         
-     
+         //set servos to close
+     ServoLeft.setPosition(0);
+     ServoRight.setPosition(1);
        
       
              
@@ -283,6 +284,14 @@
                  }
              
              
+         
+            
+             
+             
+             
+          
+      
+      
       
       
      }
@@ -411,48 +420,63 @@
        }
        // Center position
        public void Path1() {
-           driveBot(1.5, 1.5, 0.3, 5);
-           right180();
            driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.45, -0.45, 0.3, 2);
+           driveBot(-0.35, -0.35, 0.3, 2);
            sleep(200);
-           //turn towards the stage door
-           left90();
-           //drive through the stage door
-           driveBot(6, 6, 0.3, 8);
+           //turn towards the backdrop - less than 90 degrees
+           driveBot(-1.40, 1.40, 0.3, 2);
+           //drive towards the backdrop
+           CombinedArm();
+           driveBot(3, 3, 0.3, 5);
+           LeftServoDrop();
+         driveBot(-0.3, -0.3, 0.3, 5);
+          ArmZero();
            
            sleep(30000);
        }
        //Left Position
         public void Path2() {
              driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.45, -0.45, 0.3, 2);
+           driveBot(-0.35, -0.35, 0.3, 2);
            sleep(200);
-           //turn to align with the stage door
+           //turn back towards start position
+           left90();
+           //drive back to start position
+           driveBot(1.5, 1.5, 0.3, 5);
+           //turn towards stage
            right90();
-           //drive to the stage door
-           driveBot(1.5, 2, 0.3, 5);
-           //drive through the stage door
+           //drive towards backdrop
+           driveBot(2, 2, 0.3, 5);
+           //turn to drive up to backdrop
            right90();
-           driveBot(6, 6, 0.3, 8);
-           
+           //drive up to backdrop
+           driveBot(1.5, 1.5, 0.3, 5);
+           //turn towards backdrop
+           left90();
+           CombinedArm();
+           driveBot(1.1, 1.1, 0.3, 5);
+           LeftServoDrop();
+           driveBot(-0.3, -0.3, 0.3, 5);
+           ArmZero();
            sleep(30000);
        }
        //right position
         public void Path3() {
            right180();
            driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.45, -0.45, 0.3, 2);
+           driveBot(-0.35, -0.35, 0.3, 2);
            sleep(200);
-           //turn to align with the stage door
+            //turn towards the backdrop
            left90();
-           //drive to the stage door
-           driveBot(1.5, 1.5, 0.3, 5);
-           //drive through the stage door
-           right90();
-           driveBot(6, 6, 0.3, 8);
-         
-         
+           driveBot(0.6, 0.6, 0.3, 5);
+           left90();
+           //drive towards the backdrop
+           CombinedArm();
+           driveBot(2.9, 2.9, 0.3, 5);
+           LeftServoDrop();
+         driveBot(-0.3, -0.3, 0.3, 5);
+          ArmZero();
+          
          sleep(30000);
        }
        //check for 1
@@ -507,21 +531,169 @@
   
   public void RightServoDrop() {
       //open
-       ServoRight.setPosition(0);
+       ServoRight.setPosition(1);
       sleep(500);
       //close
-      ServoRight.setPosition(1);
+      ServoRight.setPosition(0);
       
   }        
   
   public void LeftServoDrop() {
       //open
-       ServoLeft.setPosition(0);
+       ServoLeft.setPosition(1);
       sleep(500);
       //close
-      ServoLeft.setPosition(1);
+      ServoLeft.setPosition(0);
       
   }      
   
+  //set wrist in transit/drop position
+  public void WristTransit() {
+   Elbow.setTargetPosition(1750);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setPower(0.8);
+   sleep(3000);
+   Elbow.setPower(0);
+   
+  }
+  
+  //set arm in drop position
+  public void ArmDrop() {
+   RightArmM.setTargetPosition(-1750);
+   LeftArmM.setTargetPosition(-1750);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   sleep(3000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   
+   
+  }
+  
+  //combined arm movement
+  public void CombinedArm() {
+   RightArmM.setTargetPosition(-1750);
+   LeftArmM.setTargetPosition(-1750);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   Elbow.setTargetPosition(1750);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setPower(0.8);
+   sleep(3000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   Elbow.setPower(0);
+  }
+  
+  //Zero the arm and wrist
+  public void ArmZero() {
+   RightArmM.setTargetPosition(0);
+   LeftArmM.setTargetPosition(0);
+    Elbow.setTargetPosition(0);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   Elbow.setPower(0.5);
+   sleep(3000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   Elbow.setPower(0);
+   
+  }
+  
+  //stafing functions
+  public void StrafeLeft(double timeoutS, double power) {
+   if(opModeIsActive()) 
+         {
+             
+             telemetry.update();
+             
+             LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             
+             runtime.reset();
+             
+              LeftFront.setPower(power);
+             RightFront.setPower(power);
+             LeftBack.setPower(-power);
+             RightBack.setPower(-power);
+ 
+         
+             while ((opModeIsActive() &&
+                 (runtime.seconds() < timeoutS) ))
+                 {
+                    telemetry.addData("Strafing left for", timeoutS);
+                     telemetry.update();
+                    
+                 }
+             LeftFront.setPower(0);
+             RightFront.setPower(0);
+             LeftBack.setPower(0);
+             RightBack.setPower(0);
+           
+             
+              RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         }   
+     
+   
+   
+  }
+  
+  
+  public void StrafeRight(double timeoutS, double power){
+   if(opModeIsActive()) 
+         {
+             
+             telemetry.update();
+             
+             LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             
+             runtime.reset();
+             
+             LeftFront.setPower(-power);
+             RightFront.setPower(-power);
+             LeftBack.setPower(power);
+             RightBack.setPower(power);
+ 
+         
+             while ((opModeIsActive() &&
+                 (runtime.seconds() < timeoutS) ))
+                 {
+                    telemetry.addData("Strafing right for", timeoutS);
+                     telemetry.update();
+         
+                 }
+             LeftFront.setPower(0);
+             RightFront.setPower(0);
+             LeftBack.setPower(0);
+             RightBack.setPower(0);
+           
+             
+              RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         }   
+     
+   
+  }
+  
   //Operational methods end
+  
+  
  }
+ 

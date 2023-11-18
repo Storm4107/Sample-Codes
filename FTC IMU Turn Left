@@ -1,10 +1,43 @@
 /**
+ * 
+ * 
+ * 
+ * 
+ * 
     * Turn left with IMU
     * Left travel distance in degrees  +/-, power to both wheels, timeout in seconds
     */
+
+
+
+    import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+@TeleOp(name = "Sensor: BNO055 IMU", group = "Sensor")
+public class SensorBNO055INU extends LinearOpMode
+    {
+    //----------------------------------------------------------------------------------------------
+    // State
+    //----------------------------------------------------------------------------------------------
+
+    // The IMU sensor object
+    BNO055IMU imu;
+
+    @Override public void runOpMode() {
+
+
+
+    }
+
     public void turnLeft()
     {
-        //MOVE RIGHT
+        //MOVE LEFT
         left.setPower(-0.2);
         right.setPower(0.2);
         
@@ -22,6 +55,8 @@
         left.setPower(0);
         right.setPower(0);
         // Pause so final telemetry is displayed.
-        sleep(1000);
+        sleep(100);
     }
     // END turnLeft
+
+}
