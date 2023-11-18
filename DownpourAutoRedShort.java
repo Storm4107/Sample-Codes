@@ -265,7 +265,7 @@
                  
                  
                  } else {
-                 left90();
+                 right90();
                  Parse2();
                      if ((LensPosition > 1.99) && (LensPosition < 2.01)) {
                          
@@ -322,7 +322,7 @@
      // END driveDistance() method
  
  
- public void driveBot(double distanceInINCHESleft, double distanceInINCHESright, double power, double timeoutS) 
+ public void driveBot(double distanceInFEETleft, double distanceInFEETright, double power, double timeoutS) 
      {
          telemetry.addData("status","encoder reset");
          telemetry.update();
@@ -335,8 +335,8 @@
              
              telemetry.update();
              
-             rightTarget = (int) driveDistance(distanceInINCHESright);
-             leftTarget = (int) -driveDistance(distanceInINCHESleft);
+             rightTarget = (int) driveDistance(distanceInFEETright);
+             leftTarget = (int) -driveDistance(distanceInFEETleft);
  
              RightFront.setTargetPosition(rightTarget);
              LeftFront.setTargetPosition(leftTarget);
@@ -422,32 +422,23 @@
            driveBot(0.35, 0.35, 0.3, 2);
            driveBot(-0.35, -0.35, 0.3, 2);
            sleep(200);
-           //turn towards the backdrop
-           right90();
+           //turn towards the backdrop - more than than 90 degrees
+            driveBot(1.48, -1.48, 0.3, 2);
            //drive towards the backdrop
-           driveBot(2, 2, 0.3, 5);
+          CombinedArm();
+           driveBot(3, 3, 0.3, 5);
+           LeftServoDrop();
+         driveBot(-0.3, -0.3, 0.3, 5);
+          ArmZero();
            
            sleep(30000);
        }
-       //Left Position
+       //right Position
         public void Path2() {
              driveBot(0.35, 0.35, 0.3, 2);
            driveBot(-0.35, -0.35, 0.3, 2);
            sleep(200);
-           //turn towards the backdrop
-           right180();
-           //drive towards the backdrop
-           driveBot(2, 2, 0.3, 5);
-           
-           sleep(30000);
-       }
-       //right position
-        public void Path3() {
-           right180();
-           driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.35, -0.35, 0.3, 2);
-           sleep(200);
-           //turn back towards start position
+           //turn towards the start position
            right90();
            //drive back to start position
            driveBot(1.5, 1.5, 0.3, 5);
@@ -458,10 +449,34 @@
            //turn to drive up to backdrop
            left90();
            //drive up to backdrop
-           driveBot(1.5, 1.5, 0.3, 5);
+           driveBot(.8, .8, 0.3, 5);
            //turn towards backdrop
            right90();
-         
+           CombinedArm();
+           driveBot(1, 1, 0.3, 5);
+           LeftServoDrop();
+           driveBot(-0.3, -0.3, 0.3, 5);
+           ArmZero();
+           sleep(30000);
+           
+           
+           sleep(30000);
+       }
+       
+       //left position
+        public void Path3() {
+           right180();
+           driveBot(0.35, 0.35, 0.3, 2);
+           driveBot(-0.35, -0.35, 0.3, 2);
+           //drive towards the backdrop
+           left90();
+           driveBot(0.45, 0.45, 0.3, 5);
+           left90();
+          CombinedArm();
+           driveBot(2.9, 2.9, 0.3, 5);
+           LeftServoDrop();
+         driveBot(-0.3, -0.3, 0.3, 5);
+          ArmZero();
          
          sleep(30000);
        }
@@ -526,12 +541,154 @@
   
   public void LeftServoDrop() {
       //open
-       ServoLeft.setPosition(0);
+       ServoLeft.setPosition(1);
       sleep(500);
       //close
-      ServoLeft.setPosition(1);
+      ServoLeft.setPosition(0);
       
   }      
+  
+  //set wrist in transit/drop position
+  public void WristTransit() {
+   Elbow.setTargetPosition(1750);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setPower(0.5);
+   sleep(1000);
+   Elbow.setPower(0);
+   
+  }
+  
+  //set arm in drop position
+  public void ArmDrop() {
+   RightArmM.setTargetPosition(1750);
+   LeftArmM.setTargetPosition(1750);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   sleep(2000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   
+  }
+  
+  //combined arm movement
+  public void CombinedArm() {
+   RightArmM.setTargetPosition(-1750);
+   LeftArmM.setTargetPosition(-1750);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   Elbow.setTargetPosition(1750);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setPower(0.8);
+   sleep(3000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   Elbow.setPower(0);
+  }
+  
+  //Zero the arm and wrist
+  public void ArmZero() {
+   RightArmM.setTargetPosition(0);
+   LeftArmM.setTargetPosition(0);
+    Elbow.setTargetPosition(0);
+   RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   RightArmM.setPower(0.5);
+   LeftArmM.setPower(0.5);
+   Elbow.setPower(0.5);
+   sleep(2000);
+   RightArmM.setPower(0);
+   LeftArmM.setPower(0);
+   Elbow.setPower(0);
+   
+  }
+  
+  //stafing functions
+  public void StrafeLeft(double timeoutS, double power) {
+   if(opModeIsActive()) 
+         {
+             
+             telemetry.update();
+             
+             LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             
+             runtime.reset();
+ 
+         
+             while ((opModeIsActive() &&
+                 (runtime.seconds() < timeoutS) ))
+                 {
+                    telemetry.addData("Strafing left for", timeoutS);
+                     telemetry.update();
+             LeftFront.setPower(power);
+             RightFront.setPower(power);
+             LeftBack.setPower(-power);
+             RightBack.setPower(-power);
+                    
+                 }
+             LeftFront.setPower(0);
+             RightFront.setPower(0);
+             LeftBack.setPower(0);
+             RightBack.setPower(0);
+           
+             
+              RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         }   
+     
+   
+   
+  }
+  
+  
+  public void StrafeRight(double timeoutS, double power){
+   if(opModeIsActive()) 
+         {
+             
+             telemetry.update();
+             
+             LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+             
+             runtime.reset();
+ 
+         
+             while ((opModeIsActive() &&
+                 (runtime.seconds() < timeoutS) ))
+                 {
+                    telemetry.addData("Strafing right for", timeoutS);
+                     telemetry.update();
+             LeftFront.setPower(-power);
+             RightFront.setPower(-power);
+             LeftBack.setPower(power);
+             RightBack.setPower(power);
+                    
+                 }
+             LeftFront.setPower(0);
+             RightFront.setPower(0);
+             LeftBack.setPower(0);
+             RightBack.setPower(0);
+           
+             
+              RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             RightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+             LeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         }   
+     
+   
+  }
   
   //Operational methods end
  }

@@ -283,14 +283,6 @@
                  }
              
              
-         
-            
-             
-             
-             
-          
-      
-      
       
       
      }
@@ -322,7 +314,7 @@
      // END driveDistance() method
  
  
- public void driveBot(double distanceInINCHESleft, double distanceInINCHESright, double power, double timeoutS) 
+ public void driveBot(double distanceInFEETleft, double distanceInFEETright, double power, double timeoutS) 
      {
          telemetry.addData("status","encoder reset");
          telemetry.update();
@@ -335,8 +327,8 @@
              
              telemetry.update();
              
-             rightTarget = (int) driveDistance(distanceInINCHESright);
-             leftTarget = (int) -driveDistance(distanceInINCHESleft);
+             rightTarget = (int) driveDistance(distanceInFEETright);
+             leftTarget = (int) -driveDistance(distanceInFEETleft);
  
              RightFront.setTargetPosition(rightTarget);
              LeftFront.setTargetPosition(leftTarget);
