@@ -26,8 +26,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
 
-@TeleOp(name = "DownpourTeleopPID")
-public class DownpourTeleopPID extends LinearOpMode {
+@TeleOp(name = "DownpourTeleopOverride")
+public class DownpourTeleopOverride extends LinearOpMode {
 
     private DcMotor FrontLeft;
 
@@ -251,18 +251,18 @@ imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientation
                         
                         //Arm control/limit
                 if (ArmTarget < ArmLimit) {
-                   ArmTarget = ArmLimit;
+                   ArmTarget = ArmTarget;
                 } else if(ArmTarget > 0) {
-                    ArmTarget = 0;
+                    ArmTarget = ArmTarget;
                 } else {
                     ArmTarget = ArmTarget;
                 }
                 
                 //Joint Control/limit
                 if (JointTarget > JointLimit) {
-                    JointTarget = JointLimit;
+                    JointTarget = JointTarget;
                 } else if(JointTarget < 0) {
-                   JointTarget = 0;
+                   JointTarget = JointTarget;
                 } else {
                     JointTarget = JointTarget;
                 }

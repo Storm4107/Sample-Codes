@@ -93,22 +93,26 @@ import com.qualcomm.robotcore.hardware.CRServo;
      private DcMotor RightBack;
  
      private DcMotor Lift;
- 
-     private DcMotor Wench;
- 
-     private DcMotor Arm;
- 
-     private DcMotor Wrist;
+
+    private DcMotor Wench;
+
+    private DcMotor Arm;
+
+    private DcMotor Joint;
+
+   
  
      private ElapsedTime runtime = new ElapsedTime();
  
-     private CRServo FrontServo;
+     private Servo ServoLeft;
  
-     private CRServo BackServo;
+     private Servo ServoRight;
+     
+    private BNO055IMU imu_IMU;
  
      static final double ENCODER_CLICKS = 1120;    // REV 40:1  1120
      static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-     static final double WHEEL_CIRC = 2.0;     // For figuring circumference
+     static final double WHEEL_CIRC = 2;     // For figuring circumference
      static final double COUNTS_PER_INCH = (ENCODER_CLICKS * DRIVE_GEAR_REDUCTION) /
              (WHEEL_CIRC * 3.1415);
      static final double DRIVE_SPEED = 1.0;
@@ -127,56 +131,62 @@ import com.qualcomm.robotcore.hardware.CRServo;
  
      @Override
      public void runOpMode() {
-
+       
+ 
          
          
          telemetry.addData("Status", "Initialized");
  
  //Motor statements
-           LeftFront = hardwareMap.get(DcMotor.class, "FrontLeft");
+         LeftFront = hardwareMap.get(DcMotor.class, "FrontLeft");
          RightFront = hardwareMap.get(DcMotor.class, "FrontRight");
          LeftBack = hardwareMap.get(DcMotor.class, "BackLeft");
          RightBack = hardwareMap.get(DcMotor.class, "BackRight");
-         Lift = hardwareMap.get(DcMotor.class, "Lift");
-         Wench = hardwareMap.get(DcMotor.class, "Wench");
-         Arm = hardwareMap.get(DcMotor.class, "Arm");
-         Wrist = hardwareMap.get(DcMotor.class, "Wrist");
-         FrontServo = hardwareMap.get(CRServo.class, "FrontServo");
-        BackServo = hardwareMap.get(CRServo.class, "BackServo");
+          Lift = hardwareMap.get(DcMotor.class, "Lift");
+        Wench = hardwareMap.get(DcMotor.class, "Wench");
+        Arm = hardwareMap.get(DcMotor.class, "Arm");
+        Joint = hardwareMap.get(DcMotor.class, "Joint");
+        Lift = hardwareMap.get(DcMotor.class, "Lift");
+        ServoLeft = hardwareMap.get(Servo.class, "ServoLeft");
+        ServoRight = hardwareMap.get(Servo.class, "ServoRight");
         
  
  
+        
          RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
          LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
          LeftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
          RightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Wench.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        Arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Joint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+ 
         
-        RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+         RightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
          LeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
          LeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
          RightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Wench.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Wench.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Joint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        LeftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        
+         LeftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
          RightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
          RightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
          LeftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+         Lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Wench.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Joint.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         
-           LeftBack.setDirection(DcMotor.Direction.REVERSE);
-         RightBack.setDirection(DcMotor.Direction.REVERSE);
          RightFront.setDirection(DcMotor.Direction.REVERSE);
-         LeftFront.setDirection(DcMotor.Direction.REVERSE);
+        RightBack.setDirection(DcMotor.Direction.REVERSE);
+        LeftFront.setDirection(DcMotor.Direction.REVERSE);
+        LeftBack.setDirection(DcMotor.Direction.REVERSE);
+        Lift.setDirection(DcMotor.Direction.REVERSE);
         
     
      
@@ -232,8 +242,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
          waitForStart();
          runtime.reset();
          
-         
-     
+         ServoLeft.setPosition(0);
+         ServoRight.setPosition(1);
        
       
              
@@ -280,6 +290,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
                  
                  
                  }
+                 left90();
+                 driveBot(-1.5, -1.5, 0.3, 3);
              
              
          
@@ -383,7 +395,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
        
        //Turn left 90
        public void left90() {
-           driveBot(1.5,1.5,speed,3);
+           driveBot(-1.65,1.65,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -399,7 +411,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
        
        //Turn Right 90
        public void right90() {
-           driveBot(1.5,-1.5,speed,3);
+           driveBot(1.65,-1.65,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -409,7 +421,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
        
        //Turn Right 180
        public void right180() {
-           driveBot(3,-3,speed,5);
+           driveBot(3.3,-3.3,speed,5);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -418,16 +430,19 @@ import com.qualcomm.robotcore.hardware.CRServo;
        }
        // Center position
        public void Path1() {
-           driveBot(0.35, 0.35, 0.3, 2);
+           driveBot(0.45, 0.45, 0.3, 2);
            driveBot(-0.35, -0.35, 0.3, 2);
            sleep(200);
-           //turn towards the backdrop 
-           right90();
+           //turn towards the backdrop
+            right90();
            //drive towards the backdrop
-           ArmDrop();
-           driveBot(-3, -3, 0.3, 5);
-           ServoDrop();
-           ArmZero();
+          CombinedArm();
+           driveBot(3.2, 3.2, 0.3, 5);
+           LeftServoDrop();
+         driveBot(-0.3, -0.3, 0.3, 5);
+          ArmZero();
+           left90();
+                 driveBot(-1.75, -1.75, 0.3, 3);
            
            sleep(30000);
        }
@@ -439,7 +454,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
            //turn towards the start position
            right90();
            //drive back to start position
-           driveBot(1.5, 1.5, 0.3, 5);
+           driveBot(1.4, 1.4, 0.3, 5);
            //turn towards stage
            left90();
            //drive towards backdrop
@@ -447,15 +462,16 @@ import com.qualcomm.robotcore.hardware.CRServo;
            //turn to drive up to backdrop
            left90();
            //drive up to backdrop
-           driveBot(.8, .8, 0.3, 5);
+           driveBot(.9, .9, 0.3, 5);
            //turn towards backdrop
-           left90();
-           ArmDrop();
-           driveBot(-1, -1, 0.3, 5);
-           ServoDrop();
+           right90();
+           CombinedArm();
+           driveBot(1.1, 1.1, 0.3, 5);
+           LeftServoDrop();
+           driveBot(-0.3, -0.3, 0.3, 5);
            ArmZero();
-           sleep(30000);
-           
+            left90();
+                 driveBot(-1.75, -1.75, 0.3, 3);
            
            sleep(30000);
        }
@@ -464,16 +480,19 @@ import com.qualcomm.robotcore.hardware.CRServo;
         public void Path3() {
            right180();
            driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.35, -0.35, 0.3, 2);
+           driveBot(-0.45, -0.45, 0.3, 2);
            //drive towards the backdrop
            left90();
-           driveBot(0.45, 0.45, 0.3, 5);
-           right90();
-          ArmDrop();
-           driveBot(-3, -3, 0.3, 5);
-          ServoDrop();
+           driveBot(-0.45, -0.45, 0.3, 5);
+           left90();
+          CombinedArm();
+           driveBot(3, 3, 0.3, 5);
+           LeftServoDrop();
+         driveBot(-0.3, -0.3, 0.3, 5);
           ArmZero();
-         
+          left90();
+          driveBot(-1.75, -1.75, 0.3, 3);
+          
          sleep(30000);
        }
        //check for 1
@@ -525,54 +544,76 @@ import com.qualcomm.robotcore.hardware.CRServo;
        }
        
        //Operational methods
-  //drop from the intake
-        public void ServoDrop() {
-      FrontServo.setPower(1);
-      BackServo.setPower(1);
-      sleep(3000);
-       FrontServo.setPower(0);
-      BackServo.setPower(0);
+  
+  public void RightServoDrop() {
+      //open
+       ServoRight.setPosition(0);
+      sleep(500);
+      //close
+      ServoRight.setPosition(1);
+      
   }        
   
-    //set wrist in transit/drop position
+  public void LeftServoDrop() {
+      //open
+       ServoLeft.setPosition(1);
+      sleep(500);
+      //close
+      ServoLeft.setPosition(0);
+      
+  }    
+  
+  //set wrist in transit/drop position
   public void WristTransit() {
-   Wrist.setTargetPosition(0); //placeholder value
-   Wrist.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-   Wrist.setPower(0.5);
+   Joint.setTargetPosition(-280);
+   Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Joint.setPower(0.5);
    sleep(1000);
-   Wrist.setPower(0);
+   Joint.setPower(0);
    
   }
-  //Set arm to scoring position
-  public void ArmDrop() {
-   Arm.setTargetPosition(-2650); //placeholder value
-   Lift.setTargetPosition(-1200);
+  
+  //set arm in drop position
+  public void CombinedArm() {
+  Arm.setTargetPosition(2650);
+   Joint.setTargetPosition(-520);
+   Lift.setTargetPosition(-250);
    Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    Arm.setPower(0.5);
+   Joint.setPower(0.9);
    Lift.setPower(0.5);
-   sleep(2000);
+   sleep(3000);
    Arm.setPower(0);
+   Joint.setPower(0);
    Lift.setPower(0);
   }
   
   //Zero the arm and wrist
   public void ArmZero() {
-   Arm.setTargetPosition(0);
-   Wrist.setTargetPosition(0);
-   Lift.setTargetPosition(0);
-   Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-   Wrist.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-   Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+  
+     
+     Arm.setTargetPosition(0);
+     Joint.setTargetPosition(0);
+     Lift.setTargetPosition(0);
+    
+     Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+     Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+     Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+     
    Arm.setPower(0.5);
-   Wrist.setPower(0.5);
+   Joint.setPower(0.5);
    Lift.setPower(0.5);
-   sleep(3000);
+   sleep(4000);
    Arm.setPower(0);
-   Wrist.setPower(0);
+   Joint.setPower(0);
    Lift.setPower(0);
-       
-   }
+   
+  }
+  
+  
+  //Operational methods end
    
   //stafing functions
   public void StrafeLeft(double timeoutS, double power) {

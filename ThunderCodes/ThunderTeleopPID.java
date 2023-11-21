@@ -25,8 +25,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
 
-@TeleOp(name = "ThunderControlPID")
-public class ThunderControlPID extends LinearOpMode {
+@TeleOp(name = "ThunderTelopPID")
+public class ThunderTeleopPID extends LinearOpMode {
 
     private DcMotor FrontLeft;
 
