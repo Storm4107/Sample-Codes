@@ -426,11 +426,12 @@
             driveBot(1.48, -1.48, 0.3, 2);
            //drive towards the backdrop
           CombinedArm();
-           driveBot(3, 3, 0.3, 5);
+           driveBot(2.7, 2.7, 0.3, 5);
            LeftServoDrop();
          driveBot(-0.3, -0.3, 0.3, 5);
           ArmZero();
-           
+           left90();
+           driveBot(-1.7,-1.7,0.3,5);
            sleep(30000);
        }
        //right Position
@@ -457,7 +458,8 @@
            LeftServoDrop();
            driveBot(-0.3, -0.3, 0.3, 5);
            ArmZero();
-           sleep(30000);
+          left90();
+           driveBot(-1.35,-1.35,0.3,5);
            
            
            sleep(30000);
@@ -470,13 +472,15 @@
            driveBot(-0.35, -0.35, 0.3, 2);
            //drive towards the backdrop
            left90();
-           driveBot(0.45, 0.45, 0.3, 5);
+           driveBot(-0.45,- 0.45, 0.3, 5);
            left90();
           CombinedArm();
            driveBot(2.9, 2.9, 0.3, 5);
            LeftServoDrop();
          driveBot(-0.3, -0.3, 0.3, 5);
           ArmZero();
+            left90();
+           driveBot(-1.85,-1.85,0.3,5);
          
          sleep(30000);
        }

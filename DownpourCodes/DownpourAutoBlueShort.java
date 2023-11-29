@@ -431,6 +431,9 @@
            LeftServoDrop();
          driveBot(-0.3, -0.3, 0.3, 5);
           ArmZero();
+          right90();
+          driveBot(-1.7,-1.7,0.3,2);
+          
            
            sleep(30000);
        }
@@ -450,7 +453,7 @@
            //turn to drive up to backdrop
            right90();
            //drive up to backdrop
-           driveBot(1.5, 1.5, 0.3, 5);
+           driveBot(1.25, 1.25, 0.3, 5);
            //turn towards backdrop
            left90();
            CombinedArm();
@@ -458,6 +461,11 @@
            LeftServoDrop();
            driveBot(-0.3, -0.3, 0.3, 5);
            ArmZero();
+           right90();
+           driveBot(-1.45,-1.45,0.3,2); 
+           
+           
+           
            sleep(30000);
        }
        //right position
@@ -468,14 +476,16 @@
            sleep(200);
             //turn towards the backdrop
            left90();
-           driveBot(0.6, 0.6, 0.3, 5);
+           driveBot(0.4, 0.4, 0.3, 5);
            left90();
            //drive towards the backdrop
            CombinedArm();
-           driveBot(2.9, 2.9, 0.3, 5);
+           driveBot(2.75, 2.75, 0.3, 5);
            LeftServoDrop();
          driveBot(-0.3, -0.3, 0.3, 5);
           ArmZero();
+           right90();
+          driveBot(-2.1,-2.1,0.3,2);
           
          sleep(30000);
        }
@@ -531,10 +541,10 @@
   
   public void RightServoDrop() {
       //open
-       ServoRight.setPosition(1);
+       ServoRight.setPosition(0);
       sleep(500);
       //close
-      ServoRight.setPosition(0);
+      ServoRight.setPosition(1);
       
   }        
   
@@ -549,26 +559,25 @@
   
   //set wrist in transit/drop position
   public void WristTransit() {
-   Elbow.setTargetPosition(1750);
+   Elbow.setTargetPosition(-250);
    Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-   Elbow.setPower(0.8);
-   sleep(3000);
+   Elbow.setPower(0.5);
+   sleep(1000);
    Elbow.setPower(0);
    
   }
   
   //set arm in drop position
   public void ArmDrop() {
-   RightArmM.setTargetPosition(-1750);
-   LeftArmM.setTargetPosition(-1750);
+   RightArmM.setTargetPosition(2100);
+   LeftArmM.setTargetPosition(2100);
    RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    RightArmM.setPower(0.5);
    LeftArmM.setPower(0.5);
-   sleep(3000);
+   sleep(2000);
    RightArmM.setPower(0);
    LeftArmM.setPower(0);
-   
    
   }
   
@@ -600,12 +609,13 @@
    RightArmM.setPower(0.5);
    LeftArmM.setPower(0.5);
    Elbow.setPower(0.5);
-   sleep(3000);
+   sleep(2000);
    RightArmM.setPower(0);
    LeftArmM.setPower(0);
    Elbow.setPower(0);
    
   }
+  
   
   //stafing functions
   public void StrafeLeft(double timeoutS, double power) {
