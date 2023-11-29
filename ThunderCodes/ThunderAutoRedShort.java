@@ -441,8 +441,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
            LeftServoDrop();
          driveBot(-0.3, -0.3, 0.3, 5);
           ArmZero();
-           left90();
-                 driveBot(-1.75, -1.75, 0.3, 3);
+          left90();
+          driveBot(-1.75, -1.75, 0.3, 3);
            
            sleep(30000);
        }
