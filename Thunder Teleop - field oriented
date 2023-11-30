@@ -1,0 +1,499 @@
+package org.firstinspires.ftc.teamcode.Thunder;
+
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+
+
+@TeleOp(name = "ThunderControlTeleop")
+public class ThunderControlTeleop extends LinearOpMode {
+
+    private DcMotor FrontLeft;
+
+    private DcMotor FrontRight;
+
+    private DcMotor BackLeft;
+
+    private DcMotor BackRight;
+
+    private DcMotor Lift;
+
+    private DcMotor Wench;
+
+    private DcMotor Arm;
+
+    private DcMotor Joint;
+
+    private Servo ServoLeft;
+    private Servo ServoRight;
+    
+    private double LiftExtension;
+    
+    private IMU imu;
+
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    static final double COUNTS_PER_MOTOR_REV = 560;    // REV 40:1  1120
+    static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+    static final double WHEEL_DIAMETER_INCHES = 3.76;     // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double DRIVE_SPEED = 1.0;
+    static final double TURN_SPEED = 0.5;
+    
+    
+    //Soft limits
+    static final double ExtensionLimit = -2000;
+    static final double ArmLimit = 3000;
+    static final double JointLimit = -550;
+
+    /**
+     * This function is executed when this Op Mode is selected from the Driver Station.
+     */
+    @Override
+    public void runOpMode() {
+        
+         
+     
+ 
+
+
+        FrontLeft = hardwareMap.get(DcMotor.class, "FrontLeft");
+        FrontRight = hardwareMap.get(DcMotor.class, "FrontRight");
+        BackLeft = hardwareMap.get(DcMotor.class, "BackLeft");
+        BackRight = hardwareMap.get(DcMotor.class, "BackRight");
+        Lift = hardwareMap.get(DcMotor.class, "Lift");
+        Wench = hardwareMap.get(DcMotor.class, "Wench");
+        Arm = hardwareMap.get(DcMotor.class, "Arm");
+        Joint = hardwareMap.get(DcMotor.class, "Joint");
+        Lift = hardwareMap.get(DcMotor.class, "Lift");
+        ServoLeft = hardwareMap.get(Servo.class, "ServoLeft");
+        ServoRight = hardwareMap.get(Servo.class, "ServoRight");
+        imu = hardwareMap.get(IMU.class, "imu");
+imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+
+        FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Wench.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Joint.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        FrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Wench.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Joint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        BackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Wench.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Joint.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //BackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // put initialization code here
+        FrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        BackRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        Lift.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+        //wait for start button to be pressed
+        waitForStart();
+
+          YawPitchRollAngles orientation;
+          orientation = imu.getRobotYawPitchRollAngles();
+          
+          imu.resetYaw();
+     
+
+        if (opModeIsActive()) {
+
+            //put run code here
+            while (opModeIsActive()) {
+
+                
+                //Drivetrain
+                    double x = -gamepad1.left_stick_x; //forward
+                    double y = -gamepad1.left_stick_y; //strafe
+                    double t = gamepad1.right_stick_x; //turn
+                    double inout = gamepad2.right_stick_y;
+                    
+                    
+                    
+                    //IMU
+                    orientation = imu.getRobotYawPitchRollAngles();
+                  
+                   double angle = orientation.getYaw(AngleUnit.RADIANS) - 1.5; //angle offset
+                    
+                    double x_rotated =x * Math.cos(angle) - y * Math.sin(angle);
+                    double y_rotated =x * Math.sin(angle) + y * Math.cos(angle);
+                  
+                    
+
+                  
+
+                        FrontLeft.setPower(x_rotated + y_rotated +t);
+                        BackLeft.setPower(x_rotated - y_rotated +t);
+                        FrontRight.setPower(x_rotated - y_rotated -t);
+                        BackRight.setPower(x_rotated + y_rotated -t);
+
+
+
+                //Elevator control/limit
+                if (Lift.getCurrentPosition() < ExtensionLimit) {
+                    Lift.setPower(Range.clip(-gamepad2.right_stick_y, 0, 1));
+                } else if(Lift.getCurrentPosition() > 0) {
+                    Lift.setPower(Range.clip(-gamepad2.right_stick_y, -1, 0));
+                } else {
+                    Lift.setPower(-gamepad2.right_stick_y);
+                }
+                
+                
+                //Arm control/limit
+                if (Arm.getCurrentPosition() > ArmLimit) {
+                    Arm.setPower(Range.clip(-gamepad2.left_stick_y, 0, -1));
+                } else if(Arm.getCurrentPosition() < 0) {
+                    Arm.setPower(Range.clip(-gamepad2.left_stick_y, 0, 1));
+                } else {
+                    Arm.setPower(-gamepad2.left_stick_y);
+                }
+               
+               
+             //wrist joint
+                if (gamepad2.right_bumper) {
+                    Joint.setPower(0.7);
+                } else if (gamepad2.left_bumper) {
+                    Joint.setPower(-0.7);
+                } else {
+                    Joint.setPower(0);
+                }
+                
+                //Joint control/limit
+                /*if (Arm.getCurrentPosition() > 2500) {
+                    Arm.setPower(Range.clip(-gamepad2.left_stick_y, 0, -1));
+                } else if(Arm.getCurrentPosition() < 0) {
+                    Arm.setPower(Range.clip(-gamepad2.left_stick_y, 0, 1));
+                } else {
+                    Arm.setPower(-gamepad2.left_stick_y);
+                } */
+                
+                //Servo controls
+                //left servo up
+                if (gamepad2.dpad_up) {
+                    ServoLeft.setPosition(1);
+                    ServoLeft.getPosition();
+                }
+
+                //left servo down
+                if (gamepad2.dpad_down) {
+                    ServoLeft.setPosition(0);
+                    ServoLeft.getPosition();
+                }
+                
+                //right servo up
+                if(gamepad2.y) {
+                    ServoRight.setPosition(0);
+                    ServoRight.getPosition();
+                }
+                //right servo down
+                if (gamepad2.a){
+                    ServoRight.setPosition(1);
+                    ServoRight.getPosition();
+                }
+                
+                
+                //preset triggers
+                if (gamepad2.x) {
+                    Pickup(0.5, 5);
+                }
+                
+                if (gamepad2.b) {
+                    Transit(0.55, 5);
+                }
+                
+                 if (gamepad2.back) {
+                    Zero(0.55, 5);
+                }
+                
+                if (gamepad2.dpad_left) {
+                  Drop(0.8, 5);
+                }
+                
+                 // Check to see if reset yaw is requested.
+        if (gamepad1.y) {
+          imu.resetYaw();
+        }
+                
+                //telemetry
+                       telemetry.update();
+                         telemetry.addData("Lift Encoder", Lift.getCurrentPosition()); 
+                         telemetry.addData("Arm Encoder", Arm.getCurrentPosition());
+                          telemetry.addData("Joint Encoder", Joint.getCurrentPosition());
+                            telemetry.addData("Yaw (Adjusted)", angle);
+                         
+
+
+            }
+
+        }
+        
+
+}
+    
+    //operational methods
+    
+
+    
+    
+    
+    //Preset methods
+    
+    //Everything zero Method
+    public void Zero(double speed, double timeoutS) {
+                    int newArmTarget;
+                    int newJointTarget;
+                    int newLiftTarget;
+                    
+                    if (opModeIsActive()) {
+                        
+                        //determine new target position
+                        newArmTarget = 0;
+                        newJointTarget = 0;
+                        newLiftTarget = 0;
+                        
+                        Arm.setTargetPosition(newArmTarget);
+                        Joint.setTargetPosition(newJointTarget);
+                        Lift.setTargetPosition(newLiftTarget);
+                    
+                        Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        
+                        ServoRight.setPosition(1);
+                        ServoLeft.setPosition(0);
+                        
+                        //reset runtime and start
+                        runtime.reset();
+                        
+                        //keep looping while opmode is active
+                        //isBusy && isbusy means when one motor hits its position, all motors will stop.
+                        //If you require that all motors reach their position, use isbusy || isbusy.
+                        while (opModeIsActive() && (runtime.seconds() < timeoutS) && ((Arm.isBusy() || (Lift.isBusy() ||Joint.isBusy())))) {
+                            
+                            //Setting Power to its respective speed variable
+                            Arm.setPower(speed);
+                            Joint.setPower(speed);
+                            Lift.setPower(speed);
+                            
+                        }
+                        
+                        // stop all motion
+                            Arm.setPower(0);
+                            Joint.setPower(0);
+                            Lift.setPower(0);
+                            
+                        // Turn off RUN_TO_POSITION
+                        
+                         Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Joint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
+                    return;
+                    
+                    
+                }
+                
+                //Pickup position method Method
+    public void Pickup(double speed, double timeoutS) {
+                    int newArmTarget;
+                    int newJointTarget;
+                    int newLiftTarget;
+                    
+                    if (opModeIsActive()) {
+                        
+                        //determine new target position
+                        newArmTarget = 850;
+                        newJointTarget = -550;
+                        newLiftTarget = 0;
+                        
+                        Arm.setTargetPosition(newArmTarget);
+                        Joint.setTargetPosition(newJointTarget);
+                        Lift.setTargetPosition(newLiftTarget);
+                    
+                        Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        
+                        //reset runtime and start
+                        runtime.reset();
+                        
+                        //keep looping while opmode is active
+                        //isBusy && isbusy means when one motor hits its position, all motors will stop.
+                        //If you require that all motors reach their position, use isbusy || isbusy.
+                        while (opModeIsActive() && (runtime.seconds() < timeoutS) && ((Arm.isBusy() || (Lift.isBusy() ||Joint.isBusy())))) {
+                            
+                            //Setting Power to its respective speed variable
+                            Arm.setPower(speed);
+                            Joint.setPower(speed);
+                            Lift.setPower(speed);
+                            
+                        }
+                        
+                        // stop all motion
+                            Arm.setPower(0);
+                            Joint.setPower(0);
+                            Lift.setPower(0);
+                            
+                        // Turn off RUN_TO_POSITION
+                        
+                         Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Joint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
+                    return;
+                    
+                    
+                }
+                
+                //Transit position method
+    public void Transit(double speed, double timeoutS) {
+                    int newArmTarget;
+                    int newJointTarget;
+                    int newLiftTarget;
+                    
+                    if (opModeIsActive()) {
+                        
+                        //determine new target position
+                        newArmTarget = 0;
+                        newJointTarget = -280;
+                        newLiftTarget = 0;
+                        
+                        Arm.setTargetPosition(newArmTarget);
+                        Joint.setTargetPosition(newJointTarget);
+                        Lift.setTargetPosition(newLiftTarget);
+                    
+                        Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        
+                        //reset runtime and start
+                        runtime.reset();
+                        
+                        //keep looping while opmode is active
+                        //isBusy && isbusy means when one motor hits its position, all motors will stop.
+                        //If you require that all motors reach their position, use isbusy || isbusy.
+                        while (opModeIsActive() && (runtime.seconds() < timeoutS) && ((Arm.isBusy() || (Lift.isBusy() ||Joint.isBusy())))) {
+                            
+                            //Setting Power to its respective speed variable
+                            Arm.setPower(speed);
+                            Joint.setPower(speed);
+                            Lift.setPower(speed);
+                            
+                        }
+                        
+                        // stop all motion
+                            Arm.setPower(0);
+                            Joint.setPower(0);
+                            Lift.setPower(0);
+                            
+                        // Turn off RUN_TO_POSITION
+                        
+                         Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Joint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
+                    return;
+                    
+                    
+                }
+                
+                //Drop position method
+    public void Drop(double speed, double timeoutS) {
+                    int newArmTarget;
+                    int newJointTarget;
+                    int newLiftTarget;
+                    
+                    if (opModeIsActive()) {
+                        
+                        //determine new target position
+                        newArmTarget = 2850;
+                        newJointTarget = -520;
+                        newLiftTarget = 0;
+                        
+                        Arm.setTargetPosition(newArmTarget);
+                        Joint.setTargetPosition(newJointTarget);
+                        Lift.setTargetPosition(newLiftTarget);
+                    
+                        Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                        
+                        //reset runtime and start
+                        runtime.reset();
+                        
+                        //keep looping while opmode is active
+                        //isBusy && isbusy means when one motor hits its position, all motors will stop.
+                        //If you require that all motors reach their position, use isbusy || isbusy.
+                        while (opModeIsActive() && (runtime.seconds() < timeoutS) && ((Arm.isBusy() || (Lift.isBusy() ||Joint.isBusy())))) {
+                            
+                            //Setting Power to its respective speed variable
+                            Arm.setPower(speed);
+                            Joint.setPower(speed);
+                            Lift.setPower(speed);
+                            
+                        }
+                        
+                        // stop all motion
+                            Arm.setPower(0);
+                            Joint.setPower(0);
+                            Lift.setPower(0);
+                            
+                        // Turn off RUN_TO_POSITION
+                        
+                         Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Joint.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        Lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    }
+                    return;
+                    
+                    
+                }
+                
+
+    
+}
