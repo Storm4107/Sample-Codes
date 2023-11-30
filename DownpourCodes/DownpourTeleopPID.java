@@ -250,20 +250,20 @@ imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientation
   
                         
                         //Arm control/limit
-                if (ArmTarget < ArmLimit) {
+                /*if (ArmTarget < ArmLimit) {
                    ArmTarget = ArmLimit;
                 } else if(ArmTarget > 0) {
                     ArmTarget = 0;
                 } else {
                     ArmTarget = ArmTarget;
                 }
-                
+                */
                 //Joint Control/limit
                 if (JointTarget > JointLimit) {
                     JointTarget = JointLimit;
                 } else if(JointTarget < 0) {
                    JointTarget = 0;
-                } else {
+                } else { 
                     JointTarget = JointTarget;
                 }
                 
