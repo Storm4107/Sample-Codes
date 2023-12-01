@@ -384,7 +384,7 @@
        
        //Turn left 90
        public void left90() {
-           driveBot(-1.5,1.5,speed,3);
+           driveBot(-1.4,1.4,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -400,7 +400,7 @@
        
        //Turn Right 90
        public void right90() {
-           driveBot(1.5,-1.5,speed,3);
+           driveBot(1.4,-1.4,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -427,7 +427,12 @@
            //turn towards the stage door
            right90();
            //drive through the stage door
-           driveBot(6, 6, 0.3, 8);
+           driveBot(6.5, 6.5, 0.8, 8);
+            ArmDrop();
+           LeftServoDrop();
+           ArmZero();
+           //turn to localize
+           right90();
            
            sleep(30000);
        }
@@ -442,7 +447,12 @@
            driveBot(1.5, 2, 0.3, 5);
            //drive through the stage door
            left90();
-           driveBot(6, 6, 0.3, 8);
+           driveBot(6.5, 6.5, 0.8, 8);
+            ArmDrop();
+           LeftServoDrop();
+           ArmZero();
+           //turn to localize
+           right90();
            
            sleep(30000);
        }
@@ -458,7 +468,12 @@
            driveBot(1.5, 1.5, 0.3, 5);
            //drive through the stage door
            left90();
-           driveBot(6, 6, 0.3, 8);
+           driveBot(6.5, 6.5, 0.8, 8);
+           ArmDrop();
+           LeftServoDrop();
+           ArmZero();
+           //turn to localize
+           right90();
          
          
          sleep(30000);
@@ -524,10 +539,10 @@
   
   public void LeftServoDrop() {
       //open
-       ServoLeft.setPosition(0);
+       ServoLeft.setPosition(1);
       sleep(500);
       //close
-      ServoLeft.setPosition(1);
+      ServoLeft.setPosition(0);
       
   }    
   
@@ -543,16 +558,19 @@
   
   //set arm in drop position
   public void ArmDrop() {
-   RightArmM.setTargetPosition(1750);
-   LeftArmM.setTargetPosition(1750);
+   RightArmM.setTargetPosition(-650);
+   LeftArmM.setTargetPosition(-650);
    RightArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    LeftArmM.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    RightArmM.setPower(0.5);
    LeftArmM.setPower(0.5);
+   Elbow.setTargetPosition(1400);
+   Elbow.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+   Elbow.setPower(0.5);
    sleep(2000);
    RightArmM.setPower(0);
    LeftArmM.setPower(0);
-   
+    Elbow.setPower(0);
   }
   
   //Zero the arm and wrist
