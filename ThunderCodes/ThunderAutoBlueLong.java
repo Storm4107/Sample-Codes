@@ -435,7 +435,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
            //turn towards the stage door
            right90();
            //drive through the stage door
-           driveBot(6, 6, 0.3, 8);
+           driveBot(6.5, 6.5, 0.8, 8);
+            ArmDrop();
+           LeftServoDrop();
+           ArmZero();
+           //turn to localize
+           right90();
            
            sleep(30000);
        }
@@ -450,7 +455,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
            driveBot(1.5, 2, 0.3, 5);
            //drive through the stage door
            left90();
-           driveBot(6, 6, 0.3, 8);
+            driveBot(6.5, 6.5, 0.8, 8);
+            ArmDrop();
+           LeftServoDrop();
+           ArmZero();
+           //turn to localize
+           right90();
            
            sleep(30000);
        }
@@ -466,7 +476,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
            driveBot(1.5, 1.5, 0.3, 5);
            //drive through the stage door
            left90();
-           driveBot(6, 6, 0.3, 8);
+            driveBot(6.5, 6.5, 0.8, 8);
+            ArmDrop();
+           LeftServoDrop();
+           ArmZero();
+           //turn to localize
+           right90();
          
          
          sleep(30000);
