@@ -63,6 +63,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
  import org.firstinspires.ftc.robotcore.external.navigation.Position;
  import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
  import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+  import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
  
  import java.util.concurrent.TimeUnit;
  
@@ -108,11 +109,13 @@ import com.qualcomm.robotcore.hardware.CRServo;
  
      private Servo ServoRight;
      
+     private Servo catcher;
+     
     private BNO055IMU imu_IMU;
  
-     static final double ENCODER_CLICKS = 1120;    // REV 40:1  1120
-     static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-     static final double WHEEL_CIRC = 2;     // For figuring circumference
+     static final double ENCODER_CLICKS = 28;    // REV 20:1  1120
+     static final double DRIVE_GEAR_REDUCTION = 20/1;     // This is < 1.0 if geared UP
+     static final double WHEEL_CIRC = 3.78;     // For figuring circumference
      static final double COUNTS_PER_INCH = (ENCODER_CLICKS * DRIVE_GEAR_REDUCTION) /
              (WHEEL_CIRC * 3.1415);
      static final double DRIVE_SPEED = 1.0;
@@ -128,6 +131,13 @@ import com.qualcomm.robotcore.hardware.CRServo;
      private final int READ_PERIOD = 1;
  
      private HuskyLens huskyLens;
+     
+      
+     private final static int LED_PERIOD = 10;
+     private final static int GAMEPAD_LOCKOUT = 500;
+     
+     RevBlinkinLedDriver Blinkin;
+     RevBlinkinLedDriver.BlinkinPattern pattern;
  
      @Override
      public void runOpMode() {
@@ -149,8 +159,11 @@ import com.qualcomm.robotcore.hardware.CRServo;
         Lift = hardwareMap.get(DcMotor.class, "Lift");
         ServoLeft = hardwareMap.get(Servo.class, "ServoLeft");
         ServoRight = hardwareMap.get(Servo.class, "ServoRight");
+        catcher = hardwareMap.get(Servo.class, "catcher");
         
- 
+   Blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+ pattern = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+ Blinkin.setPattern(pattern);
  
         
          RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -188,7 +201,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
         LeftBack.setDirection(DcMotor.Direction.REVERSE);
         Lift.setDirection(DcMotor.Direction.REVERSE);
         
-    
+     catcher.setPosition(1);
      
          
      //huskylens statements
@@ -244,19 +257,17 @@ import com.qualcomm.robotcore.hardware.CRServo;
          
          ServoLeft.setPosition(0);
          ServoRight.setPosition(1);
+          catcher.setPosition(1);
        
       
              
              //left distance, right distance, speed, runtime.
              //Distances are in FT.
              
-             //step 1 - Drive forward 2 FT and stop.
+             
               telemetry.addData("POSITION", LensPosition);
-             driveBot(2,2,speed,3);
              telemetry.addData("status","first run to position called" );
              telemetry.addData("status", LeftFront.getMode() );
-             telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
-             telemetry.addData("status","right motor,  %7d", RightFront.getCurrentPosition() );
              telemetry.update();
              RightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
              LeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -265,44 +276,36 @@ import com.qualcomm.robotcore.hardware.CRServo;
              
              //step 2
          //Conditional for camera: 
-         //if seen, proceed to Path 1
-         // if not, turn left and check there
              Parse1();
              if ((LensPosition > 0.99) && (LensPosition < 1.01)) {
                  //Path 1
+                   telemetry.addData("POSITION", LensPosition);
+                    telemetry.update();
                  Path1();
                  
                  
                  } else {
-                 right90();
-                 Parse2();
                      if ((LensPosition > 1.99) && (LensPosition < 2.01)) {
                          
                  //Path 2
+                   telemetry.addData("POSITION", LensPosition);
+                    telemetry.update();
                  Path2();    
                  } else {
                      
                   //path 3
-                  LensPosition = 3;
+                    telemetry.addData("POSITION", LensPosition);
+                    telemetry.update();
                      Path3();
                  }
                  
                  
                  
                  }
-                 left90();
-                 driveBot(-1.5, -1.5, 0.3, 3);
-             
-             
-         
-            
-             
-             
-             
           
-      
-      
-      
+             
+     
+
       
      }
      
@@ -326,7 +329,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
      */  
      public static double driveDistance(double distance)
      {
-         double drive  = (ENCODER_CLICKS/ WHEEL_CIRC);
+         double drive  = (COUNTS_PER_INCH * 12);
          int outputClicks= (int)Math.floor(drive * distance);
          return outputClicks;
      }
@@ -395,7 +398,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
        
        //Turn left 90
        public void left90() {
-           driveBot(-1.65,1.65,speed,3);
+           driveBot(-1.6,1.6,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -411,7 +414,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
        
        //Turn Right 90
        public void right90() {
-           driveBot(1.65,-1.65,speed,3);
+           driveBot(1.6,-1.60,speed,3);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -421,7 +424,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
        
        //Turn Right 180
        public void right180() {
-           driveBot(3.3,-3.3,speed,5);
+           driveBot(3.2,-3.2,speed,5);
              telemetry.addData("status","Check position 2 for object" );
              telemetry.addData("status", LeftFront.getMode() );
              telemetry.addData("status","left motor,  %7d", LeftFront.getCurrentPosition() );
@@ -430,68 +433,61 @@ import com.qualcomm.robotcore.hardware.CRServo;
        }
        // Center position
        public void Path1() {
-           driveBot(0.45, 0.45, 0.3, 2);
-           driveBot(-0.35, -0.35, 0.3, 2);
-           sleep(200);
-           //turn towards the backdrop
-            right90();
-           //drive towards the backdrop
-          CombinedArm();
-           driveBot(3.2, 3.2, 0.3, 5);
-           LeftServoDrop();
-         driveBot(-0.3, -0.3, 0.3, 5);
-          ArmZero();
-          left90();
-          driveBot(-1.75, -1.75, 0.3, 3);
-           
+       driveBot(2.2, 2.2, 0.5, 3);
+       left90();
+       driveBot(0.4, 0.4, 0.5, 1);
+         catcher.setPosition(0.6);
+         sleep(350);
+         driveBot(-1.5, -1.5, 0.5, 3);
+         right180();
+         CombinedArm();
+         driveBot(1.55, 1.55, 0.5, 3);
+         StrafeLeft(0.5, 0.3);
+         LeftServoDrop();
+          driveBot(-0.3, -0.3, 0.3, 2);
+            ArmZero();
+            left90();
+              driveBot(-2.2, -2.2, 0.6, 3);
            sleep(30000);
        }
        //right Position
         public void Path2() {
-             driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.35, -0.35, 0.3, 2);
-           sleep(200);
-           //turn towards the start position
-           right90();
-           //drive back to start position
-           driveBot(1.4, 1.4, 0.3, 5);
-           //turn towards stage
-           left90();
-           //drive towards backdrop
-           driveBot(2, 2, 0.3, 5);
-           //turn to drive up to backdrop
-           left90();
-           //drive up to backdrop
-           driveBot(.9, .9, 0.3, 5);
-           //turn towards backdrop
+          driveBot(1.5, 1.5, 0.5, 3);
+           driveBot(-0.2, -0.2, 0.5, 3);
+           catcher.setPosition(0.6);
+           sleep(350);
+           driveBot(-0.7, -0.7, 0.3, 3);
            right90();
            CombinedArm();
-           driveBot(1.1, 1.1, 0.3, 5);
-           LeftServoDrop();
-           driveBot(-0.3, -0.3, 0.3, 5);
-           ArmZero();
+            driveBot(3.15, 3.15, 0.5, 3);
+            LeftServoDrop();
+            driveBot(-0.3, -0.3, 0.3, 2);
+            ArmZero();
             left90();
-                 driveBot(-1.75, -1.75, 0.3, 3);
-           
+              driveBot(-2, -2, 0.6, 3);
            sleep(30000);
        }
        
        //left position
         public void Path3() {
-           right180();
-           driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.45, -0.45, 0.3, 2);
-           //drive towards the backdrop
-           left90();
-           driveBot(-0.45, -0.45, 0.3, 5);
-           left90();
-          CombinedArm();
-           driveBot(3, 3, 0.3, 5);
-           LeftServoDrop();
-         driveBot(-0.3, -0.3, 0.3, 5);
-          ArmZero();
+           driveBot(0.25, 0.25, 0.3, 3);
+          right90();
+          driveBot(2.25, 2.25, 0.5, 3);
           left90();
-          driveBot(-1.75, -1.75, 0.3, 3);
+           driveBot(1.25, 1.25, 0.3, 3);
+           left90();
+            driveBot(.90, .90, 0.3, 3);
+            catcher.setPosition(0.6);
+             sleep(350);
+              driveBot(-.90, -.90, 0.3, 3);
+              right180();
+              CombinedArm();
+              driveBot(0.5, 0.5, 0.3, 2);
+               LeftServoDrop();
+            driveBot(-0.3, -0.3, 0.3, 2);
+            ArmZero();
+            left90();
+              driveBot(-1.3, -1.3, 0.5, 3);
           
          sleep(30000);
        }
@@ -500,48 +496,42 @@ import com.qualcomm.robotcore.hardware.CRServo;
             
              HuskyLens.Block[] blocks = huskyLens.blocks();
              telemetry.addData("Block count", blocks.length);
-             for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-            
+             
              telemetry.update();
-                   telemetry.addData("Block count", blocks.length);
              for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-             if (blocks.length == 1) {
+                   telemetry.addData("Block", blocks[i].toString());
+                    telemetry.addData("Block Position", blocks[i].x);
+            
+             if (( blocks[i].x > 20)&&( blocks[i].x <100 )) { //1
                  telemetry.addData("IT WORKS", "");
                  LensPosition = 1;
                   telemetry.addData("POSITION", LensPosition);
              
                    telemetry.update();
-             } 
-          
-         
-       }
-       //check for 2
-        public void Parse2() {
-          
-          HuskyLens.Block[] blocks = huskyLens.blocks();
-             telemetry.addData("Block count", blocks.length);
-             for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-            
-             telemetry.update();
-                   telemetry.addData("Block count", blocks.length);
-             for (int i = 0; i < blocks.length; i++) {
-                 telemetry.addData("Block", blocks[i].toString());
-             } 
-             if (blocks.length == 1) {
+             }
+             //path 2
+              if (( blocks[i].x >120)&&( blocks[i].x <230 )) { //1
                  telemetry.addData("IT WORKS", "");
                  LensPosition = 2;
                   telemetry.addData("POSITION", LensPosition);
              
                    telemetry.update();
-             } 
+             }
+                // 3
+                if (( blocks[i].x > 240)&&( blocks[i].x <320 )) { //1
+                 telemetry.addData("IT WORKS", "");
+                 LensPosition = 3;
+                  telemetry.addData("POSITION", LensPosition);
+             
+                   telemetry.update();
+             
+              
+             }
+             }
+        
          
        }
+      
        
        //Operational methods
   
@@ -550,16 +540,16 @@ import com.qualcomm.robotcore.hardware.CRServo;
        ServoRight.setPosition(0);
       sleep(500);
       //close
-      ServoRight.setPosition(1);
+  
       
   }        
   
   public void LeftServoDrop() {
       //open
-       ServoLeft.setPosition(1);
+       ServoLeft.setPosition(1.1);
       sleep(500);
       //close
-      ServoLeft.setPosition(0);
+    
       
   }    
   
@@ -575,16 +565,16 @@ import com.qualcomm.robotcore.hardware.CRServo;
   
   //set arm in drop position
   public void CombinedArm() {
-  Arm.setTargetPosition(2650);
-   Joint.setTargetPosition(-520);
+  Arm.setTargetPosition(2000);
+   Joint.setTargetPosition(-510);
    Lift.setTargetPosition(-250);
    Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    Arm.setPower(0.5);
-   Joint.setPower(0.9);
+   Joint.setPower(1);
    Lift.setPower(0.5);
-   sleep(3000);
+   sleep(3500);
    Arm.setPower(0);
    Joint.setPower(0);
    Lift.setPower(0);
@@ -593,11 +583,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
   //Zero the arm and wrist
   public void ArmZero() {
   
-     
+       ServoLeft.setPosition(0);
+       ServoRight.setPosition(1);
      Arm.setTargetPosition(0);
      Joint.setTargetPosition(0);
      Lift.setTargetPosition(0);
-    
+    sleep(200);
      Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
      Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
      Lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
