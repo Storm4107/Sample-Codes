@@ -108,6 +108,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
  
      private Servo ServoRight;
      
+     private Servo catcher;
+     
     private BNO055IMU imu_IMU;
  
      static final double ENCODER_CLICKS = 1120;    // REV 40:1  1120
@@ -149,6 +151,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
         Lift = hardwareMap.get(DcMotor.class, "Lift");
         ServoLeft = hardwareMap.get(Servo.class, "ServoLeft");
         ServoRight = hardwareMap.get(Servo.class, "ServoRight");
+        catcher = hardwareMap.get(Servo.class, "catcher");
         
  
  
@@ -187,6 +190,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
         LeftFront.setDirection(DcMotor.Direction.REVERSE);
         LeftBack.setDirection(DcMotor.Direction.REVERSE);
         Lift.setDirection(DcMotor.Direction.REVERSE);
+        
+        catcher.setPosition(1);
      
          
      //huskylens statements
@@ -240,10 +245,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
          waitForStart();
          runtime.reset();
          
+         catcher.setPosition(1);
          
-     
-       
-      
+         
              
              //left distance, right distance, speed, runtime.
              //Distances are in FT.
@@ -420,15 +424,24 @@ import com.qualcomm.robotcore.hardware.CRServo;
        public void Path1() {
            driveBot(1.5, 1.5, 0.3, 5);
            right180();
-           driveBot(0.35, 0.35, 0.3, 2);
-           driveBot(-0.45, -0.45, 0.3, 2);
+           driveBot(0.15, 0.15, 0.3, 2);
+           catcher.setPosition(0.6);
+           driveBot(-0.5, -0.5, 0.3, 2);
            sleep(200);
            //turn towards the stage door
            left90();
            //drive through the stage door
-            driveBot(6.5, 6.5, 0.8, 8);
+            driveBot(6.3, 6.3, 0.8, 8);
+            driveBot(-0.4, -0.4, 0.3, 2);
+            right90();
+            driveBot(1.3, 1.3, 0.3, 2);
+            left90();
             ArmDrop();
-           LeftServoDrop();
+            driveBot(0.7, 0.7, 0.3, 2);
+            LeftServoDrop();
+            driveBot(-0.15, -0.15, 0.3, 2);
+            right90();
+            driveBot(-0.5, -0.5, 0.3, 2);
            ArmZero();
            //turn to localize
            right90();
@@ -469,7 +482,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
            right90();
             driveBot(6.5, 6.5, 0.8, 8);
             ArmDrop();
-           LeftServoDrop();
+           RightServoDrop();
            ArmZero();
            //turn to localize
            right90();
@@ -558,7 +571,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
   //set arm in drop position
   public void ArmDrop() {
    Arm.setTargetPosition(2850);
-   Joint.setTargetPosition(-480);
+   Joint.setTargetPosition(-560);
    Lift.setTargetPosition(0);
    Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
    Joint.setMode(DcMotor.RunMode.RUN_TO_POSITION);
